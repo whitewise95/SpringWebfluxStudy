@@ -1,22 +1,20 @@
-package com.example.webflux.java.soket;
+package ch07_JavaNIO.soket;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
-public class JavaNIoNonBlockMultiServer {
+public class JavaNIoNonBlockServer {
+
     private static AtomicInteger count = new AtomicInteger(0);
-    private static ExecutorService executorService = Executors.newFixedThreadPool(50);
 
     @SneakyThrows
     public static void main(String[] args) {
@@ -25,24 +23,23 @@ public class JavaNIoNonBlockMultiServer {
             serverSocket.bind(new InetSocketAddress("localhost", 8080));
             serverSocket.configureBlocking(false);
 
-            while (true) {
+            while (true){
                 SocketChannel channel = serverSocket.accept();
 
-                if (channel == null) {
+                if (channel == null){
                     Thread.sleep(100);
                     continue;
                 }
 
-
-                CompletableFuture.runAsync(() -> handleRequest(channel), executorService);
+                handleRequest(channel);
             }
         }
     }
 
     @SneakyThrows
-    private static void handleRequest(SocketChannel channel) {
+    private static void handleRequest(SocketChannel channel) throws IOException, InterruptedException {
         ByteBuffer requestBodyByteBuffer = ByteBuffer.allocateDirect(1024);
-        while (channel.read(requestBodyByteBuffer) == 0) {
+        while (channel.read(requestBodyByteBuffer) == 0){
             log.info("Reading");
         }
 

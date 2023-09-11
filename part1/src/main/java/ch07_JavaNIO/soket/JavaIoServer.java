@@ -1,4 +1,4 @@
-package com.example.webflux.java.soket;
+package ch07_JavaNIO.soket;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
