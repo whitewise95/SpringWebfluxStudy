@@ -16,7 +16,7 @@
 - 바이트 기반 입력 스트림의 최상위 추상클래스이며, 어떤 source로 부터 데이터를 읽을지에 따라 다양한 구현체 존재  => `FileInputStream, ByteArrayInputStream, BufferedInputStream`
 - Closable 구현하고 있어서 `close` 함수 가지고 있으면 InputStream의 함수 `read` 를 가지고 있다.
 > `read` : stream으로 데이터를 읽고, 읽은 값을 반환, -1이라면 끝에 도달했다는 것을 의미  
-> `close` : stream을 닫고 더 이상 데이터를 읽지 않는다.  
+> `close` : stream을 닫고 더 이상 데이터를 읽지 않는다.    
 
 ![img_14.png](img_14.png)
 
