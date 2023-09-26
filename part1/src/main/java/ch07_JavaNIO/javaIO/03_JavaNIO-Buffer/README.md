@@ -41,14 +41,14 @@ JVM 내부 버퍼로 복사 시 발생하는 CPU연산, GC관리, IO요청에 �
 --- 
 
 # 2) channel과 Buffer
-### ⬜️ channel
+### ⭐️ channel
 > java IO에서 Stream은 파일을 읽기 위한 InputStream 쓰기 위한 OutputStream 객체가 별도로 존재해 단방향으로 흐르지만 NIO의 채널은  
 > 채널 하나로 읽기와 쓰기를 사용하는 양방향이 가능하다. 채널은 ByteChannel, FileChannel SocketChannel 등 이 존재한다.  
 
 
 <br>
 
-### ⬜️ Buffer  
+### ⭐️ Buffer  
 > 버퍼(Buffer)는 저장되는 데이터 타입에 따라 분류될 수 있고, 어떤 메모리를 사용하느냐에 따라 다이렉트(Direct)와 넌다이렉트(NonDirect)로 분류할 수도 있다.    
 > NonDirect 버퍼는 JVM이 관리하는 힙 메모리 공간을 이용하는 버퍼이고, Direct 버퍼는 운영체제가 관리하는 메모리 공간을 이용하는 버퍼이다.  
 
@@ -74,6 +74,43 @@ JVM 내부 버퍼로 복사 시 발생하는 CPU연산, GC관리, IO요청에 �
 <br>
 
 ## 2-3) 예제
+
+```java
+class Test {
+
+	public static void main(String[] args) throws IOException {
+		File file = new File("C:\\Users\\coffe\\Documents\\practice\\study\\part1\\example.txt");
+
+		FileChannel fileChannel = FileChannel.open(file.toPath());
+
+		ByteBuffer byteBuffer = ByteBuffer.allocateDirect(1024);
+		System.out.println("allocate : " + byteBuffer);  // 1. allocate : java.nio.DirectByteBuffer[pos=0 lim=1024 cap=1024]
+
+		// file로부터 값을 읽어서 byteBuffer에 write
+		fileChannel.read(byteBuffer);
+		System.out.println("write : " + byteBuffer);  // write : java.nio.DirectByteBuffer[pos=16 lim=1024 cap=1024]
+
+		// flip()을 호출하여 읽기모드로 전환
+		byteBuffer.flip();
+		System.out.println("flip : " + byteBuffer); // flip : java.nio.DirectByteBuffer[pos=0 lim=16 cap=1024]
+
+		// 읽기모드로 전환하여 처음부터 limit까지 읽음
+		CharBuffer decode = StandardCharsets.UTF_8.decode(byteBuffer);
+		System.out.println(decode);  // 안녕하세요!
+		System.out.println("read : " + byteBuffer); // read : java.nio.DirectByteBuffer[pos=16 lim=16 cap=1024]
+
+		byteBuffer.rewind();
+		System.out.println("rewind : " + byteBuffer);  // rewind : java.nio.DirectByteBuffer[pos=0 lim=16 cap=1024]
+
+		byteBuffer.clear();
+		System.out.println("clear : " + byteBuffer); // clear : java.nio.DirectByteBuffer[pos=0 lim=1024 cap=1024]
+	}
+}
+```
+
+<br>
+<br>
+
 
 ⭕️ 1. `ByteBuffer byteBuffer = ByteBuffer.allocateDirect(1024);` 로 생성된 Buffer는 capacity는 초기 주어진 값으로 Limit은 capacity와 동일하고  position은 0으로 세팅된다.   
 
@@ -111,37 +148,5 @@ JVM 내부 버퍼로 복사 시 발생하는 CPU연산, GC관리, IO요청에 �
 
 <br>
 
-```java
-class Test {
-
-	public static void main(String[] args) throws IOException {
-		File file = new File("C:\\Users\\coffe\\Documents\\practice\\study\\part1\\example.txt");
-
-		FileChannel fileChannel = FileChannel.open(file.toPath());
-
-		ByteBuffer byteBuffer = ByteBuffer.allocateDirect(1024);
-		System.out.println("allocate : " + byteBuffer);  // 1. allocate : java.nio.DirectByteBuffer[pos=0 lim=1024 cap=1024]
-
-		// file로부터 값을 읽어서 byteBuffer에 write
-		fileChannel.read(byteBuffer);
-		System.out.println("write : " + byteBuffer);  // write : java.nio.DirectByteBuffer[pos=16 lim=1024 cap=1024]
-
-		// flip()을 호출하여 읽기모드로 전환
-		byteBuffer.flip();
-		System.out.println("flip : " + byteBuffer); // flip : java.nio.DirectByteBuffer[pos=0 lim=16 cap=1024]
-
-		// 읽기모드로 전환하여 처음부터 limit까지 읽음
-		CharBuffer decode = StandardCharsets.UTF_8.decode(byteBuffer);
-		System.out.println(decode);  // 안녕하세요!
-		System.out.println("read : " + byteBuffer); // read : java.nio.DirectByteBuffer[pos=16 lim=16 cap=1024]
-
-		byteBuffer.rewind();
-		System.out.println("rewind : " + byteBuffer);  // rewind : java.nio.DirectByteBuffer[pos=0 lim=16 cap=1024]
-
-		byteBuffer.clear();
-		System.out.println("clear : " + byteBuffer); // clear : java.nio.DirectByteBuffer[pos=0 lim=1024 cap=1024]
-	}
-}
-```
 
 
